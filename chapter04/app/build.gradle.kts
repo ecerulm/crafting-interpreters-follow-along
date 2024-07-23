@@ -8,6 +8,7 @@
 plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
+    eclipse
 }
 
 repositories {
@@ -34,7 +35,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "com.craftinginterpreters.lox.Lox"
 }
 
 tasks.named<Test>("test") {
