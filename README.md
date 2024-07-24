@@ -3,6 +3,11 @@
 Following along the book [Crafting Interpreters](https://craftinginterpreters.com/)
 
 
+# Run 
+
+```
+./gradlew run
+```
 
 
 # References

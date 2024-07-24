@@ -102,9 +102,12 @@ class Scanner {
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
             case '/':
-                if (match('/')) {
+                if (match('/') && peek() == '/') {
                     // A comment goes until the end of the line
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (peek() == '*') {
+                  advance();
+                  comment();
                 } else {
                     addToken(SLASH);
                 }
@@ -130,6 +133,28 @@ class Scanner {
                 }
                 break;
         }
+    }
+    private void comment() {
+
+      int level = 1;
+      while (level > 0) {
+        if (isAtEnd()) {
+          Lox.error(line, "Unterminated comment");
+          return;
+        } else if (peek() == '/' && peekNext() == '*') {
+          level++;
+          advance();advance();
+          continue;
+        } else if (peek() == '*' && peekNext() == '/') {
+          level--;
+          advance();advance();
+        } else {
+          advance();
+        }
+      }
+      return;
+
+      // will not emit  any token
     }
 
     private void identifier() {
