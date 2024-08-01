@@ -1,6 +1,8 @@
 package com.craftinginterpreters.lox;
 
-class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
+
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
@@ -28,11 +30,11 @@ class Interpreter implements Expr.Visitor<Object> {
                 if (left instanceof String && right instanceof String) {
                     return (String) left + (String) right;
                 }
-                break;
+                throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
             case SLASH:
                 return (double) left / (double) right;
             case STAR:
-                return (double) left / (double) right;
+                return (double) left * (double) right;
         }
         return null;
     }
@@ -74,5 +76,45 @@ class Interpreter implements Expr.Visitor<Object> {
 
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt) {
+      stmt.accept(this); // this implements Stmt.Visitor<Void> 
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression exprStmt) {
+      evaluate(exprStmt.expression);
+      return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+      Object value =  evaluate(stmt.expression);
+      System.out.println(stringify(value));
+      return null;
+    }
+
+    void interpret(List<Stmt> statements) {
+      try {
+        for(Stmt statement: statements) {
+          execute(statement);
+        }
+      } catch (RuntimeError error) { //RuntimeError is defined in this project do not confuse with RuntimeException
+        Lox.runtimeError(error);
+      }
+    }
+
+    private String stringify(Object object) {
+      if (object == null) return "nil";
+
+      if (object instanceof Double) {
+        String text = object.toString();
+        if (text.endsWith(".0")) {
+          text = text.substring(0, text.length() - 2);
+        }
+        return text;
+      }
+      return object.toString();
     }
 }

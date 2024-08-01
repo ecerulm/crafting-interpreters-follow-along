@@ -2,10 +2,12 @@ package com.craftinginterpreters.lox;
 
 import static com.craftinginterpreters.lox.TokenType.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class Parser {
     private static class ParseError extends RuntimeException {}
+
     private final List<Token> tokens;
     private int current = 0;
 
@@ -13,12 +15,15 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-      try {
-          return expression();
-      } catch (ParseError error) {
-          return null;
-      }
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        try {
+            while (!isAtEnd()) {
+                statements.add(statement());
+            }
+        } catch (ParseError e) {
+        }
+        return statements;
     }
 
     /*
@@ -34,6 +39,25 @@ class Parser {
     */
     private Expr expression() { // one method per grammar rule
         return equality();
+    }
+
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        // the PRINT token was already consumed in statement()
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        // this is NOT called from printStatement()
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after expression");
+        return new Stmt.Expression(value);
     }
 
     private Expr equality() {
@@ -80,44 +104,41 @@ class Parser {
         return expr;
     }
 
-
     // unary          → ( "!" | "-" ) unary
     private Expr unary() {
-      if (match(BANG, MINUS)) {
-          Token operator = previous();
-          Expr right = unary();
-          return new Expr.Unary(operator, right);
-      }
-      return primary();
+        if (match(BANG, MINUS)) {
+            Token operator = previous();
+            Expr right = unary();
+            return new Expr.Unary(operator, right);
+        }
+        return primary();
     }
 
     // primary        → NUMBER | STRING | "true" | "false" | "nil"
     private Expr primary() {
-      if (match(FALSE)) return new Expr.Literal(false);
-      if (match(TRUE)) return new Expr.Literal(true);
-      if (match(NIL)) return new Expr.Literal(null);
-      if (match(NUMBER, STRING)) {
-          return new Expr.Literal(previous().literal);
-      }
-      if (match(LEFT_PAREN)) {
-          Expr expr = expression();
-          consume(RIGHT_PAREN, "Expect ')' after expression.");
-          return new Expr.Grouping(expr);
-      }
-      throw error(peek(), "Expect expression.");
-
+        if (match(FALSE)) return new Expr.Literal(false);
+        if (match(TRUE)) return new Expr.Literal(true);
+        if (match(NIL)) return new Expr.Literal(null);
+        if (match(NUMBER, STRING)) {
+            return new Expr.Literal(previous().literal);
+        }
+        if (match(LEFT_PAREN)) {
+            Expr expr = expression();
+            consume(RIGHT_PAREN, "Expect ')' after expression.");
+            return new Expr.Grouping(expr);
+        }
+        throw error(peek(), "Expect expression.");
     }
 
     private Token consume(TokenType type, String message) {
-      if (check(type)) return advance();
-      throw error(peek(), message);
+        if (check(type)) return advance();
+        throw error(peek(), message);
     }
 
     private ParseError error(Token token, String message) {
-      Lox.error(token, message);
-      return new ParseError(); // does not throw error , it return an error
+        Lox.error(token, message);
+        return new ParseError(); // does not throw error , it return an error
     }
-
 
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
@@ -150,6 +171,4 @@ class Parser {
     private Token previous() {
         return tokens.get(current - 1);
     }
-
-
 }

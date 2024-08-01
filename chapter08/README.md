@@ -18,6 +18,14 @@ source $(pyenv prefix craftinginterpreters)/bin/activate
 $(brew --prefix openjdk@21)/bin/java -classpath ./app/bin/main com.craftinginterpreters.lox.Lox
 ```
 
+
+# Run REPL 
+
+
+```
+$(brew --prefix openjdk@21)/bin/java -classpath ./app/bin/main com.craftinginterpreters.lox.Lox
+```
+
 # Running AstPrinter
 
 ```
