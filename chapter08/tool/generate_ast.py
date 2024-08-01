@@ -23,18 +23,26 @@ env.filters["split"] = split
 template = env.get_template("Expr.java")
 
 
-def define_ast(output_dir, types):
-    template.stream(basename="Expr", types=types).dump(f"{output_dir}/Expr.java")
+def define_ast(output_dir, basename, types):
+    template.stream(basename=basename, types=types).dump(f"{output_dir}/{basename}.java")
 
 
 def main():
-    types = [
+    expr_types = [
         "Binary   : Expr left, Token operator, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
         "Unary    : Token operator, Expr right",
     ]
-    define_ast("app/src/main/java/com/craftinginterpreters/lox", types)
+    outputDir = "app/src/main/java/com/craftinginterpreters/lox"
+    define_ast(outputDir, basename="Expr", types=expr_types)
+
+    stmt_types = [
+        "Expression   : Expr expression",
+        "Print        : Expr expression",
+    ]
+
+    define_ast(outputDir, "Stmt", stmt_types)
 
 
 if __name__ == "__main__":

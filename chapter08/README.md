@@ -1,4 +1,17 @@
 
+# Generate the ast classes 
+
+
+```
+pyenv virtualenv 3.12 craftinginterpreters
+source $(pyenv prefix craftinginterpreters)/bin/activate
+```
+
+
+
+
+
+# build
 
 ```
 ./gradlew build
