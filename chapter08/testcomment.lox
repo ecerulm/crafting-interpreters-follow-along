@@ -1,0 +1,14 @@
+/* comment */
+
+"string1"
+
+/* multiline comment
+ *  line2 
+ * line3
+ */
+
+ "string2"
+
+ /* nested comments /* aaa */ if ("a" > "b") {} */
+
+ "string3"
