@@ -33,6 +33,7 @@ def main():
         "Grouping : Expr expression",
         "Literal  : Object value",
         "Unary    : Token operator, Expr right",
+        "Variable : Token name",
     ]
     outputDir = "app/src/main/java/com/craftinginterpreters/lox"
     define_ast(outputDir, basename="Expr", types=expr_types)
@@ -40,9 +41,11 @@ def main():
     stmt_types = [
         "Expression   : Expr expression",
         "Print        : Expr expression",
+        "Var          : Token name, Expr initializer",
     ]
 
     define_ast(outputDir, "Stmt", stmt_types)
+
 
 
 if __name__ == "__main__":

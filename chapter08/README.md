@@ -1,4 +1,16 @@
 
+# Grammar
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | printStmt ;”
+
+```
 # Generate the ast classes 
 
 
