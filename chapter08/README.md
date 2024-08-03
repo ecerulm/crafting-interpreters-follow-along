@@ -1,7 +1,25 @@
 
 # Grammar
 
+
 ```
+
+expression     → assignment ; 
+assignment     → IDENTIFIER "=" assignment
+               | equality ;”
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary        → "true" | "false" | "nil"
+               | NUMBER | STRING
+               | "(" expression ")"
+               | IDENTIFIER ;
+
+
+
 program        → declaration* EOF ;
 
 declaration    → varDecl
@@ -9,6 +27,11 @@ declaration    → varDecl
 
 statement      → exprStmt
                | printStmt ;”
+
+exprStmt       → expression ";" ;
+printStmt      → "print" expression ";" ;
+
+
 
 ```
 # Generate the ast classes 
