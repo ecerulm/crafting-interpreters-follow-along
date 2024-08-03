@@ -1,5 +1,7 @@
 package com.craftinginterpreters.lox;
 
+import com.craftinginterpreters.lox.Expr.Variable;
+
 class AstPrinter implements Expr.Visitor<String> {
   String print(Expr expr) {
     return expr.accept(this);
@@ -45,5 +47,11 @@ class AstPrinter implements Expr.Visitor<String> {
         new Expr.Grouping(new Expr.Literal(45.67))
     );
     System.out.println(new AstPrinter().print(expression));
+  }
+
+  @Override
+  public String visitVariableExpr(Variable expr) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'visitVariableExpr'");
   }
 }

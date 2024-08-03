@@ -17,12 +17,12 @@ class Parser {
 
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
-        try {
-            while (!isAtEnd()) {
-                statements.add(statement());
-            }
-        } catch (ParseError e) {
+        // try {
+        while (!isAtEnd()) {
+            statements.add(declaration());
         }
+        // } catch (ParseError e) {
+        // }
         return statements;
     }
 
@@ -41,9 +41,24 @@ class Parser {
         return equality();
     }
 
+    private Stmt declaration() {
+        try {
+            // declaration: varDeclaration | statement;
+            if (match(VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError e) {
+            synchronize();
+            return null;
+        }
+    }
+
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
         return expressionStatement();
+    }
+
+    private void synchronize() {
+      throw new RuntimeException("Not implemented yet");
     }
 
     private Stmt printStatement() {
@@ -53,10 +68,24 @@ class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt varDeclaration() {
+      // varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+      // the "var" token was consumed already by the rule that calls this rule
+      Token name = consume(IDENTIFIER, "Expect variable name");
+
+      Expr initializer = null;
+      if(match(EQUAL)) { // this is optional you can declare a variable without initializing it
+        initializer = expression();
+      }
+
+      consume(SEMICOLON, "Expect ';' after variable declaration.");
+      return new Stmt.Var(name, initializer);
+    }
+
     private Stmt expressionStatement() {
         // this is NOT called from printStatement()
         Expr value = expression();
-        consume(SEMICOLON, "Expect ';' after expression");
+        consume(SEMICOLON, "Expect ';' after expression"); // consume will throw error if there is no match
         return new Stmt.Expression(value);
     }
 
@@ -114,13 +143,20 @@ class Parser {
         return primary();
     }
 
-    // primary        → NUMBER | STRING | "true" | "false" | "nil"
+		// “primary        → "true" | "false" | "nil"
+		//                | NUMBER | STRING
+		//                | "(" expression ")"
+		//                | IDENTIFIER ;”
+
     private Expr primary() {
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NIL)) return new Expr.Literal(null);
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+        if (match(IDENTIFIER)) {
+          return new Expr.Variable(previous());
         }
         if (match(LEFT_PAREN)) {
             Expr expr = expression();
