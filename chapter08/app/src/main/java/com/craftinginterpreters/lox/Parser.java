@@ -58,7 +58,25 @@ class Parser {
     }
 
     private void synchronize() {
-      throw new RuntimeException("Not implemented yet");
+      // advance until you find a semicolon or the "start of a new statement"
+      advance();
+      while (!isAtEnd()) {
+        if (previous().type == SEMICOLON) return; 
+        switch (peek().type) {
+          case CLASS:
+          case FUN:
+          case VAR:
+          case FOR:
+          case IF:
+          case WHILE:
+          case PRINT:
+          case RETURN:
+            return;
+          default:
+            // not the start of a new statement so continue skipping tokens
+        }
+        advance();
+      }
     }
 
     private Stmt printStatement() {
