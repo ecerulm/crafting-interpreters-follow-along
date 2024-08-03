@@ -29,6 +29,7 @@ def define_ast(output_dir, basename, types):
 
 def main():
     expr_types = [
+        "Assign   : Token name, Expr value",
         "Binary   : Expr left, Token operator, Expr right",
         "Grouping : Expr expression",
         "Literal  : Object value",
