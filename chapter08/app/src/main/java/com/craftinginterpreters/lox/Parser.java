@@ -27,18 +27,45 @@ class Parser {
     }
 
     /*
-    expression     → equality ;
-    equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-    comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-    term           → factor ( ( "-" | "+" ) factor )* ;
-    factor         → unary ( ( "/" | "*" ) unary )* ;
-    unary          → ( "!" | "-" ) unary
-                   | primary ;
-    primary        → NUMBER | STRING | "true" | "false" | "nil"
-                   | "(" expression ")" ;”
+
+      expression     → assignment ; 
+      assignment     → IDENTIFIER "=" assignment
+                     | equality ;”
+      equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+      comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+      term           → factor ( ( "-" | "+" ) factor )* ;
+      factor         → unary ( ( "/" | "*" ) unary )* ;
+      unary          → ( "!" | "-" ) unary
+                     | primary ;
+      primary        → "true" | "false" | "nil"
+                     | NUMBER | STRING
+                     | "(" expression ")"
+                     | IDENTIFIER ;
+
     */
     private Expr expression() { // one method per grammar rule
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+      // since we have only LL(1) lookahead
+      // we first parse it as an equality
+      Expr expr = equality();
+
+      // if happend to find a = after it then 
+      // it means that it was really an assignment
+      if (match(EQUAL)) { 
+        Token equals = previous();
+        Expr value = assignment(); // recursive 
+
+        if (expr instanceof Expr.Variable) {
+          // valid target l-value for the assignment
+          Token name = ((Expr.Variable)expr).name;
+          return new Expr.Assign(name,value);
+        }
+        error(equals, "Invalid assignment target.");
+      }
+      return expr; // no equals after the expr means it's just a regular expression
     }
 
     private Stmt declaration() {

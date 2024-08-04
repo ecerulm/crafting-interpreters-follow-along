@@ -9,6 +9,9 @@ Following along the book [Crafting Interpreters](https://craftinginterpreters.co
 ./gradlew run
 ```
 
+# progress so far
+
+* Chapter 8.1
 
 # References
 
