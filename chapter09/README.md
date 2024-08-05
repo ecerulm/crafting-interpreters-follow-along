@@ -29,7 +29,17 @@ declaration    → varDecl
 block          -> "{" declaration* "}";
 
 statement      → exprStmt
-               | printStmt ;”
+               | ifStmt
+               | printStmt
+               | block ;
+
+ifStmt         → "if" "(" expression ")" statement
+               ( "else" statement )? ;
+
+Excerpt From
+Crafting Interpreters
+Robert Nystrom
+This material may be protected by copyright.
 
 exprStmt       → expression ";" ;
 printStmt      → "print" expression ";" ;
