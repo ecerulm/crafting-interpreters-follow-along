@@ -23,7 +23,10 @@ primary        → "true" | "false" | "nil"
 program        → declaration* EOF ;
 
 declaration    → varDecl
-               | statement ;
+               | statement 
+               | block;
+
+block          -> "{" declaration* "}";
 
 statement      → exprStmt
                | printStmt ;”

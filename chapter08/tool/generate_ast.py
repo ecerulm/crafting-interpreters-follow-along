@@ -40,6 +40,7 @@ def main():
     define_ast(outputDir, basename="Expr", types=expr_types)
 
     stmt_types = [
+        "Block        : List<Stmt> statements",
         "Expression   : Expr expression",
         "Print        : Expr expression",
         "Var          : Token name, Expr initializer",
