@@ -8,6 +8,8 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
+        // Opposed to visitLogicalExpr , we evaluate both lhs and rhs
+        // no shortcut logic
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
 
@@ -55,6 +57,22 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Expr.Logical expr) {
+      Object left = evaluate(expr.left); // left side is always evaluated
+
+      if (expr.operator.type == TokenType.OR) {
+        // if left side is already true there is no need to evaluate rhs
+        if (isTruthy(left)) return left;
+      } else  {
+        // if left side is false no need to evaluate rhs
+        if (!isTruthy(left)) return left;
+      }
+
+      // if we reach this point evaluate rhs and return that.
+      return evaluate(expr.right);
     }
 
     @Override

@@ -49,8 +49,11 @@ class Parser {
 
     private Expr assignment() {
       // since we have only LL(1) lookahead
-      // we first parse it as an equality
-      Expr expr = equality();
+      // we first parse it as an logic_or and if we find a  EQUAL later 
+      // then it means it was really an assignment
+
+      Expr expr = or();
+      // Expr expr = equality();
 
       // if happend to find a = after it then 
       // it means that it was really an assignment
@@ -66,6 +69,25 @@ class Parser {
         error(equals, "Invalid assignment target.");
       }
       return expr; // no equals after the expr means it's just a regular expression
+    }
+
+    private Expr or() {
+      Expr expr = and();
+      while (match(OR)) {
+        Token operator = previous();
+        Expr right = and();
+        expr = new Expr.Logical(expr, operator, right);
+      }
+      return expr;
+    }
+    private Expr and() {
+      Expr expr = equality();
+      while (match(AND)) {
+        Token operator = previous();
+        Expr right = equality();
+        expr = new Expr.Logical(expr, operator, right);
+      }
+      return expr;
     }
 
     private Stmt declaration() {
