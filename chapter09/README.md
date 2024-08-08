@@ -31,10 +31,18 @@ declaration    → varDecl
 block          -> "{" declaration* "}";
 
 statement      → exprStmt
+               | forStmt
                | ifStmt
                | printStmt
+               | whileStmt
                | block ;
 
+forStmt        → "for" "(" 
+                 ( varDecl | exprStmt | ";") // varDecl and exprStmt already have a ";" at the end
+                 expression? ";"
+                 expression? ")" statement;
+               ;
+whileStmt      → "while" "(" expression ")" statement ;
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )? ;
 
