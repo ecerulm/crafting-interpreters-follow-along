@@ -118,6 +118,28 @@ class Parser {
       return new ParseError(); // does not throw error , it return an error
     }
 
+    private void synchronize() {
+        advance();
+    
+        while (!isAtEnd()) {
+          if (previous().type == SEMICOLON) return;
+    
+          switch (peek().type) {
+            case CLASS:
+            case FUN:
+            case VAR:
+            case FOR:
+            case IF:
+            case WHILE:
+            case PRINT:
+            case RETURN:
+              return;
+          }
+    
+          advance();
+        }
+    }
+
 
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
